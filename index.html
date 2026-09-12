@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Учет: Продажи и Оплаты</title>
-    <!-- Подключение современного шрифта Inter -->
+    <title>Skladex: Продажи и Оплаты</title>
+    <!-- Подключение шрифтов Inter и Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-page: #7A8B7B;
@@ -64,27 +64,47 @@
             box-shadow: var(--shadow-card);
         }
 
-        /* Шапка приложения */
+        /* Шапка приложения с центрированным логотипом */
         .app-header {
-            display: flex;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
             align-items: center;
             padding-bottom: 20px;
             border-bottom: 1px solid var(--border-subtle);
             margin-bottom: 24px;
             gap: 15px;
-            flex-wrap: wrap;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .header-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
         }
 
         .app-title {
             margin: 0;
-            font-size: 1.35em;
-            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.1em;
+            font-weight: 800;
             color: var(--text-primary);
             display: flex;
             align-items: center;
-            gap: 10px;
-            letter-spacing: -0.02em;
+            justify-content: center;
+            gap: 8px;
+            letter-spacing: -0.01em;
+            text-align: center;
         }
 
         #cloudStatusBadge {
@@ -99,6 +119,7 @@
             color: var(--text-secondary);
             border: 1px solid var(--border-subtle);
             transition: all 0.2s ease;
+            white-space: nowrap;
         }
 
         .btn-home {
@@ -113,6 +134,7 @@
             align-items: center;
             gap: 6px;
             transition: all 0.15s ease;
+            white-space: nowrap;
         }
         .btn-home:hover {
             background: var(--surface-hover);
@@ -206,50 +228,6 @@
             font-size: 0.95em;
             line-height: 1.55;
             margin: 0;
-        }
-
-        /* ГЛАВНЫЕ ВКЛАДКИ */
-        .main-tabs {
-            display: none;
-            background: rgba(0, 0, 0, 0.05);
-            padding: 4px;
-            border-radius: var(--radius-lg);
-            margin-bottom: 24px;
-            gap: 6px;
-            border: 1px solid var(--border-subtle);
-        }
-
-        .main-tab-btn {
-            flex: 1;
-            padding: 12px 24px;
-            cursor: pointer;
-            background: transparent;
-            border: none;
-            font-size: 0.95em;
-            font-weight: 600;
-            color: var(--text-secondary);
-            border-radius: var(--radius-md);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            text-align: center;
-        }
-
-        .main-tab-btn:hover {
-            color: var(--text-primary);
-            background: rgba(255, 255, 255, 0.5);
-        }
-
-        .main-tab-btn.active-main {
-            background: #ffffff;
-            color: var(--primary);
-            box-shadow: var(--shadow-subtle);
-            border: 1px solid var(--border-subtle);
-        }
-
-        .main-tab-btn.active-payment {
-            background: #ffffff;
-            color: #7c3aed;
-            box-shadow: var(--shadow-subtle);
-            border: 1px solid var(--border-subtle);
         }
 
         /* ПОДВКЛАДКИ (Pill Nav) */
@@ -653,6 +631,17 @@
             border: 1px solid var(--border-subtle);
             box-shadow: var(--shadow-elevated);
         }
+
+        @media (max-width: 768px) {
+            .app-header {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 10px;
+            }
+            .header-left, .header-center, .header-right {
+                justify-content: center;
+            }
+        }
     </style>
     <!-- Подключение Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -662,13 +651,17 @@
 
 <div class="container">
     
-    <!-- Шапка со статусом синхронизации -->
+    <!-- Шапка приложения -->
     <header class="app-header">
-        <div style="display: flex; align-items: center; gap: 12px;">
+        <div class="header-left">
             <button class="btn-home" id="btnGoHome" onclick="goToStartScreen()">🏠 Меню</button>
-            <h1 class="app-title">📦 Складской учёт</h1>
         </div>
-        <div id="cloudStatusBadge">🟡 Подключение к облаку...</div>
+        <div class="header-center">
+            <h1 class="app-title">⚡ Skladex</h1>
+        </div>
+        <div class="header-right">
+            <div id="cloudStatusBadge">🟡 Подключение к облаку...</div>
+        </div>
     </header>
 
     <!-- ================= 0. СТАРТОВЫЙ ЭКРАН ================= -->
@@ -705,12 +698,6 @@
         </div>
     </div>
 
-    <!-- ГЛАВНАЯ НАВИГАЦИЯ (показывается внутри разделов) -->
-    <div class="main-tabs" id="mainTabsBar">
-        <button class="main-tab-btn active-main" id="mainTabBtn-sales" onclick="switchMainTab('sales_wrapper', this, 'active-main')">🛒 ПРОДАЖИ</button>
-        <button class="main-tab-btn" id="mainTabBtn-payment" onclick="switchMainTab('payment', this, 'active-payment')">💳 ОПЛАТЫ</button>
-    </div>
-
     <!-- ================= РАЗДЕЛ "ПРОДАЖИ" ================= -->
     <div id="sales_wrapper" class="main-tab-content">
         
@@ -740,7 +727,6 @@
                 <button class="btn-sell-all" style="margin-left: auto;" onclick="sellSelected()">Выдать выбранные</button>
             </div>
 
-            <!-- Группированное отображение заказов для выдачи -->
             <div id="saleGroupedContent"></div>
         </div>
 
@@ -773,10 +759,8 @@
                 <div>📦 Общая сумма всех закупок: <span id="totalWarehouseValue">0.00</span> ₽</div>
             </div>
 
-            <!-- Заказы по клиентам -->
             <div id="buyGroupedContent"></div>
 
-            <!-- Раскрывающийся список всех товаров -->
             <details style="margin-top: 25px; background: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #ddd;">
                 <summary style="font-size: 1.1em; font-weight: bold; cursor: pointer; outline: none;">📦 Все товары на складе (Развернуть)</summary>
                 <table style="margin-top: 15px;">
@@ -807,7 +791,6 @@
                 <div style="padding-top: 15px; border-top: 1px dashed #ccc;">
                     <h3 style="margin-bottom: 10px; font-size: 1.1em; color: #555;">Список клиентов:</h3>
                     <ul id="clientsList" style="list-style: none; padding: 0; margin: 0;">
-                        <!-- Динамический список клиентов -->
                     </ul>
                 </div>
             </div>
@@ -865,7 +848,6 @@
                             </tr>
                         </thead>
                         <tbody id="reportTableBody">
-                            <!-- Записи отчёта -->
                         </tbody>
                     </table>
                 </div>
@@ -876,18 +858,18 @@
 
     <!-- ================= РАЗДЕЛ "ОПЛАТЫ" ================= -->
     <div id="payment" class="main-tab-content">
-        <!-- ПОДМЕНЮ ОПЛАТ -->
+        <!-- ПОДВКЛАДКИ ОПЛАТ: АКТИВНЫЕ И ИСТОРИЯ -->
         <div class="sub-tabs">
-            <button class="sub-tab-btn payment-sub-btn active-payment-sub" onclick="switchPaymentSubTab('payment_active', this)">⏳ ОЖИДАЮТ ОПЛАТЫ</button>
-            <button class="sub-tab-btn payment-sub-btn" onclick="switchPaymentSubTab('payment_history', this)">✅ ОПЛАЧЕННЫЕ (ИСТОРИЯ)</button>
+            <button class="sub-tab-btn active-payment-sub" onclick="switchPaymentSubTab('payment_active', this)">⏳ Активные заказы</button>
+            <button class="sub-tab-btn" onclick="switchPaymentSubTab('payment_history', this)">✅ Оплаченные (История)</button>
         </div>
         
-        <!-- АКТИВНЫЕ ОПЛАТЫ -->
+        <!-- 1. АКТИВНЫЕ ОПЛАТЫ -->
         <div id="payment_active" class="payment-sub-content active">
             <div id="paymentActiveContent"></div>
         </div>
         
-        <!-- ИСТОРИЯ ОПЛАТ -->
+        <!-- 2. ИСТОРИЯ ОПЛАТ -->
         <div id="payment_history" class="payment-sub-content">
             <div id="paymentHistoryContent"></div>
         </div>
@@ -999,38 +981,32 @@
     // Навигация стартового экрана
     function goToStartScreen() {
         document.getElementById('start_screen').style.display = 'block';
-        document.getElementById('mainTabsBar').style.display = 'none';
         document.getElementById('btnGoHome').style.display = 'none';
         document.querySelectorAll('.main-tab-content').forEach(tab => tab.classList.remove('active'));
     }
 
     function openSection(sectionId) {
         document.getElementById('start_screen').style.display = 'none';
-        document.getElementById('mainTabsBar').style.display = 'flex';
         document.getElementById('btnGoHome').style.display = 'inline-flex';
 
-        const tabBtn = sectionId === 'sales_wrapper' 
-            ? document.getElementById('mainTabBtn-sales') 
-            : document.getElementById('mainTabBtn-payment');
-        const activeClass = sectionId === 'sales_wrapper' ? 'active-main' : 'active-payment';
-
-        switchMainTab(sectionId, tabBtn, activeClass);
-    }
-
-    function switchMainTab(tabId, btnElement, activeClass) {
         document.querySelectorAll('.main-tab-content').forEach(tab => tab.classList.remove('active'));
-        document.querySelectorAll('.main-tab-btn').forEach(btn => btn.classList.remove('active-main', 'active-payment'));
-        
-        document.getElementById(tabId).classList.add('active');
-        btnElement.classList.add(activeClass);
+        document.getElementById(sectionId).classList.add('active');
     }
 
     function switchSubTab(tabId, btnElement, activeClass) {
         document.querySelectorAll('.sub-tab-content').forEach(tab => tab.classList.remove('active'));
-        document.querySelectorAll('.sub-tab-btn').forEach(btn => btn.classList.remove('active-sale', 'active-buy', 'active-clients', 'active-report'));
+        document.querySelectorAll('#sales_wrapper .sub-tab-btn').forEach(btn => btn.classList.remove('active-sale', 'active-buy', 'active-clients', 'active-report'));
         
         document.getElementById(tabId).classList.add('active');
         btnElement.classList.add(activeClass);
+    }
+
+    function switchPaymentSubTab(tabId, btnElement) {
+        document.querySelectorAll('.payment-sub-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('#payment .sub-tab-btn').forEach(btn => btn.classList.remove('active-payment-sub'));
+        
+        document.getElementById(tabId).classList.add('active');
+        btnElement.classList.add('active-payment-sub');
     }
 
     function setReportPeriod(period) {
@@ -1039,14 +1015,6 @@
         const activeBtn = document.getElementById('btnPeriod-' + period);
         if (activeBtn) activeBtn.classList.add('active-period');
         renderReport();
-    }
-
-    function switchPaymentSubTab(tabId, btnElement) {
-        document.querySelectorAll('.payment-sub-content').forEach(tab => tab.classList.remove('active'));
-        document.querySelectorAll('.payment-sub-btn').forEach(btn => btn.classList.remove('active-payment-sub'));
-        
-        document.getElementById(tabId).classList.add('active');
-        btnElement.classList.add('active-payment-sub');
     }
 
     const statusBadge = document.getElementById('cloudStatusBadge');
@@ -1413,12 +1381,12 @@
         if (saleGroupedContent) saleGroupedContent.innerHTML = '';
         if (buyTbody) buyTbody.innerHTML = '';
         buyGroupedContent.innerHTML = '';
-        paymentActiveContent.innerHTML = '';
-        paymentHistoryContent.innerHTML = '';
+        if (paymentActiveContent) paymentActiveContent.innerHTML = '';
+        if (paymentHistoryContent) paymentHistoryContent.innerHTML = '';
         
+        let totalWarehouseValue = 0;
         let activePaymentsCount = 0;
         let historyPaymentsCount = 0;
-        let totalWarehouseValue = 0;
         
         const selectAllCb = document.getElementById('selectAllCheckbox');
         if(selectAllCb) selectAllCb.checked = false;
@@ -1582,7 +1550,7 @@
                 buyGroupedContent.innerHTML += buyHtml;
             }
 
-            // --- 3. ОПЛАТЫ ---
+            // --- 3. ОПЛАТЫ (Активные и История) ---
             if (client !== 'Общий склад') {
                 const paymentItems = order.items.filter(i => (i.initialQty !== undefined ? i.initialQty : i.qty) > 0);
                 if (paymentItems.length > 0) {
@@ -1590,7 +1558,7 @@
                     let paymentHtml = `
                     <div class="section-box">
                         <h2 style="color: #6f42c1; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
-                            <span style="font-size: 1.1em; margin: 0;">📅 Заказ от: ${orderDateStr}</span>
+                            <span style="font-size: 1.1em; margin: 0;">👤 ${client} — 📅 Заказ от: ${orderDateStr}</span>
                         </h2>
                         <table>
                             <thead>
@@ -1622,12 +1590,12 @@
                     if (debt < 0) debt = 0; 
                     
                     let isFullyPaid = !(debt > 0.001 || paid === 0);
-                    let debtStatusColor = isFullyPaid ? '#28a745' : '#dc3545';
-                    let debtStatusText = isFullyPaid ? 'Оплачено полностью' : 'Остаток долга';
+                    let debtStatusColor = isFullyPaid ? '#059669' : '#e11d48';
+                    let debtStatusText = isFullyPaid ? '✅ Оплачено полностью' : '⏳ Остаток долга';
 
                     let debtDisplayHtml = isFullyPaid 
-                        ? `<div style="color: ${debtStatusColor}; font-size: 1.1em; margin-top: 10px; font-weight: bold;">${debtStatusText}</div>`
-                        : `<div style="color: ${debtStatusColor}; font-size: 1.1em; margin-top: 10px; font-weight: bold;">${debtStatusText}: <span>${debt.toFixed(2)} ₽</span></div>`;
+                        ? `<div style="color: ${debtStatusColor}; font-size: 1.05em; margin-top: 8px; font-weight: bold;">${debtStatusText}</div>`
+                        : `<div style="color: ${debtStatusColor}; font-size: 1.05em; margin-top: 8px; font-weight: bold;">${debtStatusText}: <span>${debt.toFixed(2)} ₽</span></div>`;
 
                     let actionHtml = '';
                     if (isFullyPaid) {
@@ -1638,13 +1606,13 @@
                                 <div style="flex: 1; background: #fff8e1; padding: 8px 12px; border-radius: 4px; border: 1px solid #ffe082; color: #665000; font-style: italic;">
                                     📝 ${comment}
                                 </div>
-                                <button class="btn-secondary" style="background: #17a2b8; padding: 8px 12px;" onclick="editComment('${oId}')">✎ Изменить</button>
+                                <button class="btn-secondary" style="background: #17a2b8; color: white; padding: 8px 12px;" onclick="editComment('${oId}')">✎ Изменить</button>
                             </div>`;
                         } else {
                             actionHtml = `
                             <div id="commentBox-${oId}" style="display: flex; gap: 10px; align-items: center; background: #fff; padding: 10px; border-radius: 6px; border: 1px solid #ddd; flex: 1; max-width: 450px;">
                                 <input type="text" id="commentInput-${oId}" value="" placeholder="Комментарий к заказу" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1;">
-                                <button class="btn-secondary" style="background: #28a745;" onclick="saveComment('${oId}')">💾 Сохранить</button>
+                                <button class="btn-secondary" style="background: #28a745; color: white;" onclick="saveComment('${oId}')">💾 Сохранить</button>
                             </div>`;
                         }
                     } else {
@@ -1690,10 +1658,10 @@
             buyGroupedContent.innerHTML = '<p style="color: var(--text-secondary); font-size: 1.1em;">На складе пока нет добавленных товаров.</p>';
         }
         
-        if (activePaymentsCount === 0) {
+        if (activePaymentsCount === 0 && paymentActiveContent) {
             paymentActiveContent.innerHTML = '<p style="color: var(--text-secondary); font-size: 1.1em; padding: 15px;">Нет активных заказов, ожидающих оплаты.</p>';
         }
-        if (historyPaymentsCount === 0) {
+        if (historyPaymentsCount === 0 && paymentHistoryContent) {
             paymentHistoryContent.innerHTML = '<p style="color: var(--text-secondary); font-size: 1.1em; padding: 15px;">В истории пока нет полностью оплаченных заказов.</p>';
         }
 
@@ -1949,7 +1917,7 @@
             box.style.border = '1px solid #ddd';
             box.innerHTML = `
                 <input type="text" id="commentInput-${orderId}" value="${currentComment}" placeholder="Комментарий к заказу" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1;">
-                <button class="btn-secondary" style="background: #28a745;" onclick="saveComment('${orderId}')">💾 Сохранить</button>
+                <button class="btn-secondary" style="background: #28a745; color: white;" onclick="saveComment('${orderId}')">💾 Сохранить</button>
             `;
             const input = document.getElementById(`commentInput-${orderId}`);
             if (input) {
@@ -2064,7 +2032,7 @@
             inventory = inventory.filter(i => i.id !== id);
             if (item) {
                 const oId = item.orderId || 'legacy_' + item.client;
-                if (!inventory.some(i => (i.orderId || 'legacy_' + item.client) === oId)) {
+                if (!inventory.some(i => (i.orderId || 'legacy_' + i.client) === oId)) {
                     delete payments[oId];
                     delete comments[oId];
                 }
